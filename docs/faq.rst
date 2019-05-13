@@ -19,10 +19,10 @@ supporting mod blocks is not trivial.
 Can I view Overviewer maps without having an internet connection?
 -----------------------------------------------------------------
 
-Not at the moment. The Overviewer relies on the Google maps API to display
-maps, which your browser needs to load from Google. However, switching away
-from Google Maps is something that will most likely be looked into in the
-future.
+Yes, absolutely. The Overviewer switched away from the Google Maps API and
+now uses Leaflet. All files which Overviewer needs are included in the output,
+so even if you have no internet connection, you will still be able to view the
+map without any issues.
 
 When my map expands, I see remnants of another zoom level
 ---------------------------------------------------------
@@ -60,13 +60,7 @@ You've added a new feature or changed textures, but it's not showing up on my ma
 Some new features will only show up in newly-rendered areas. Use the
 :option:`--forcerender` option to update the entire map. If you have a really
 large map and don't want to re-render everything, take a look at
-the :ref:`rerenderprob` configuration option.
-
-How do I use this on CentOS 5?
-------------------------------
-
-CentOS 5 comes with Python 2.4, but the Overviewer needs 2.6 or higher. See the
-special instructions at :ref:`centos`
+the :ref:`rerenderprob<rerenderprob>` configuration option.
 
 The background color of the map is black, and I don't like it!
 --------------------------------------------------------------

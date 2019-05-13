@@ -25,7 +25,7 @@ The function should accept one argument (a dictionary, also know as an associati
 array), and return a string representing the text to be displayed.  For example::
 
     def signFilter(poi):
-        if poi['id'] == 'Sign':
+        if poi['id'] == 'Sign' or poi['id'] == 'minecraft:sign':
             return "\n".join([poi['Text1'], poi['Text2'], poi['Text3'], poi['Text4']])
 
 If a POI doesn't match, the filter can return None (which is the default if a python 
@@ -44,24 +44,24 @@ the Minecraft Wiki.
 A more complicated filter function can construct a more customized display text::
 
     def chestFilter(poi):
-        if poi['id'] == "Chest":
-            return "Chest with %d items" % len(poi['Items'])
+        if poi['id'] == "Chest" or poi['id'] == 'minecraft:chest':
+            return "Chest with %d items" % len(poi.get('Items', []))
 
 It is also possible to return a tuple from the filter function to specify a hovertext
 different from the text displayed in the info window. The first entry of the tuple will
 be used as the hover text, the second will be used as the info window content::
 
     def chestFilter(poi):
-        if poi['id'] == "Chest":
-            return ("Chest", "Chest with %d items" % len(poi['Items']))
+        if poi['id'] == "Chest" or poi['id'] == 'minecraft:chest':
+            return ("Chest", "Chest with %d items" % len(poi.get('Items', [])))
 
 Because of the way the config file is loaded, if you need to import a function or module
-for use in your filter function, you need to explicitly load it into the global namespace:
+for use in your filter function, you need to explicitly load it into the global namespace::
 
     global escape
     from cgi import escape
     def signFilter(poi):
-        if poi['id'] == 'Sign':
+        if poi['id'] == 'Sign' or poi['id'] == 'minecraft:sign':
             return "\n".join(map(escape, [poi['Text1'], poi['Text2'], poi['Text3'], poi['Text4']]))
 
 Since writing these filters can be a little tedious, a set of predefined filters
@@ -92,7 +92,7 @@ Here's an example that displays icons for each player::
 
     def playerIcons(poi):
         if poi['id'] == 'Player':
-            poi['icon'] = "http://overviewer.org/avatar/%s" % poi['EntityId']
+            poi['icon'] = "https://overviewer.org/avatar/%s" % poi['EntityId']
             return "Last known location for %s" % poi['EntityId']
 
 Note how each POI can get a different icon by setting ``poi['icon']``. These icons must exist in either
@@ -238,9 +238,27 @@ outputdir.
 Options
 -------
 
-genPOI.py has a single option :option:`--config`. You should use the same configfile as 
-used for your normal renders.
+genPOI comes with a few options of its own.
 
+.. cmdoption:: -c <file>, --config=<file>
+
+    The config file to use for the genPOI operation. This must be the same
+    config file that you use for your normal rendering runs.
+
+.. cmdoption:: -q, --quiet
+
+    Outputs less information onto the terminal while running.
+
+.. cmdoption:: --skip-scan
+
+    Skip scanning the world for entities and tile entities. Useful if you only
+    want to generate markers for players or through manual POIs, as you can
+    speed up the genPOI operation considerably.
+
+.. cmdoption:: --skip-players
+
+    Skip reading and retrieving player data during genPOI runs. This is useful
+    if you don't plan on generating markers for the player locations.
 
 .. _predefined_filter_functions:
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 # The contrib manager is used to help control the contribs script 
 # that are shipped with overviewer in Windows packages
@@ -14,9 +14,7 @@ if not hasattr(sys, "frozen"):
 from overviewer_core import nbt
 
 scripts=dict( # keys are names, values are scripts
-        clearOldCache   = "clearOldCache.py",
         convertCyrillic = "cyrillic_convert.py",
-        findSigns       = "findSigns.py",
         playerInspect   = "playerInspect.py",
         rerenderBlocks  = "rerenderBlocks.py",
         testRender      = "testRender.py",

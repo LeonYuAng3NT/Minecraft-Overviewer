@@ -24,9 +24,16 @@
 #ifndef __OVERVIEWER_H_INCLUDED__
 #define __OVERVIEWER_H_INCLUDED__
 
+
+#define WINVER 0x0601
+#define _WIN32_WINNT 0x0601
+
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+
+
 // increment this value if you've made a change to the c extesion
 // and want to force users to rebuild
-#define OVERVIEWER_EXTENSION_VERSION 49
+#define OVERVIEWER_EXTENSION_VERSION 62
 
 /* Python PIL, and numpy headers */
 #include <Python.h>
@@ -34,11 +41,9 @@
 #include <Imaging.h>
 /* Fix Pillow on mingw-w64 which includes windows.h in Imaging.h */
 #undef TRANSPARENT
+/* Utility macros */
+#include "utils.h"
 
-/* like (a * b + 127) / 255), but much faster on most platforms
-   from PIL's _imaging.c */
-#define MULDIV255(a, b, tmp)								\
-	(tmp = (a) * (b) + 128, ((((tmp) >> 8) + (tmp)) >> 8))
 
 /* macro for getting a value out of various numpy arrays the 3D arrays have
    interesting, swizzled coordinates because minecraft (anvil) stores blocks
@@ -47,11 +52,6 @@
 #define getArrayShort3D(array, x,y,z) (*(unsigned short *)(PyArray_GETPTR3((array), (y), (z), (x))))
 #define getArrayByte2D(array, x,y) (*(unsigned char *)(PyArray_GETPTR2((array), (y), (x))))
 
-
-/* generally useful MAX / MIN macros */
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define CLAMP(x, a, b) (MIN(MAX(x, a), b))
 
 /* in composite.c */
 Imaging imaging_python_to_c(PyObject *obj);
@@ -83,11 +83,11 @@ typedef struct {
     /* whether this chunk is loaded: use load_chunk to load */
     int loaded;
     /* chunk biome array */
-    PyObject *biomes;
+    PyArrayObject *biomes;
     /* all the sections in a given chunk */
     struct {
         /* all there is to know about each section */
-        PyObject *blocks, *data, *skylight, *blocklight;
+        PyArrayObject *blocks, *data, *skylight, *blocklight;
     } sections[SECTIONS_PER_CHUNK];
 } ChunkData;
 typedef struct {
@@ -113,8 +113,8 @@ typedef struct {
     unsigned short block_pdata;
 
     /* useful information about this, and neighboring, chunks */
-    PyObject *blockdatas;
-    PyObject *blocks;
+    PyArrayObject *blockdatas;
+    PyArrayObject *blocks;
     
     /* 3x3 array of this and neighboring chunk columns */
     ChunkData chunks[3][3];    
@@ -163,7 +163,7 @@ typedef enum
 static inline unsigned int get_data(RenderState *state, DataType type, int x, int y, int z)
 {
     int chunkx = 1, chunky = state->chunky, chunkz = 1;
-    PyObject *data_array = NULL;
+    PyArrayObject *data_array = NULL;
     unsigned int def = 0;
     if (type == SKYLIGHT)
         def = 15;

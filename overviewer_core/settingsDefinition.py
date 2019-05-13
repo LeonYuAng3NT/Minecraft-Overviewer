@@ -71,6 +71,8 @@ renders = Setting(required=True, default=util.OrderedDict(),
             "forcerender": Setting(required=False, validator=validateBool, default=None),
             "imgformat": Setting(required=True, validator=validateImgFormat, default="png"),
             "imgquality": Setting(required=False, validator=validateImgQuality, default=95),
+            "imglossless": Setting(required=False, validator=validateBool,
+                                   default=True),
             "bgcolor": Setting(required=True, validator=validateBGColor, default="1a1a1a"),
             "defaultzoom": Setting(required=True, validator=validateDefaultZoom, default=1),
             "optimizeimg": Setting(required=True, validator=validateOptImg, default=[]),
@@ -102,10 +104,6 @@ worlds = Setting(required=True, validator=make_dictValidator(validateStr, valida
 outputdir = Setting(required=True, validator=validateOutputDir, default=None)
 
 processes = Setting(required=True, validator=int, default=-1)
-
-# memcached is an option, but unless your IO costs are really high, it just
-# ends up adding overhead and isn't worth it.
-memcached_host = Setting(required=False, validator=str, default=None)
 
 # TODO clean up this ugly in sys.argv hack
 if platform.system() == 'Windows' or not sys.stdout.isatty() or "--simple" in sys.argv:

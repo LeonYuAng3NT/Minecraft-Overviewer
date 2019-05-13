@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 # -*- coding: iso-8859-1 -*-
 #
 # progressbar  - Text progressbar library for python.
@@ -314,6 +314,7 @@ class ProgressBar(object):
         else:
             self.finished = True
             self.fd.write(self._format_line() + '\n')
+        self.fd.flush()
         return True
 
     def start(self):

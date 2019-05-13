@@ -16,6 +16,8 @@
  */
 
 #include "../overviewer.h"
+#include "../mc_id.h"
+#include "../block_class.h"
 #include "lighting.h"
 #include <math.h>
 
@@ -49,7 +51,7 @@ struct SmoothLightingFace {
 };
 
 /* top face touchups, pulled from textures.py (_build_block) */
-static int top_touchups[] = {3, 4, 7, 2, 11, 0};
+static int top_touchups[] = {1, 5, 3, 4, 5, 3, 7, 2, 9, 1, 11, 0};
 
 /* the lighting face rule list! */
 static struct SmoothLightingFace lighting_rules[] = {
@@ -83,7 +85,7 @@ static struct SmoothLightingFace lighting_rules[] = {
              -1, 0, 0,
              0, 0, 1},
         },
-     top_touchups, 3},
+     top_touchups, 6},
     
     /* left */
     {-1, 0, 0, {
@@ -218,7 +220,9 @@ smooth_lighting_draw(void *data, RenderState *state, PyObject *src, PyObject *ma
     
     /* special case for leaves, water 8, water 9, ice 79
        -- these are also smooth-lit! */
-    if (state->block != 18 && state->block != 8 && state->block != 9 && state->block != 79 && is_transparent(state->block))
+    if (!block_class_is_subset(state->block, (mc_block_t[]){
+            block_leaves,block_flowing_water,block_water,block_ice
+        }, 4) && is_transparent(state->block))
     {
         /* transparent blocks are rendered as usual, with flat lighting */
         primitive_lighting.draw(data, state, src, mask, mask_light);
@@ -228,7 +232,7 @@ smooth_lighting_draw(void *data, RenderState *state, PyObject *src, PyObject *ma
     /* non-transparent blocks get the special smooth treatment */
     
     /* special code for water */
-    if (state->block == 9)
+    if (state->block == block_water)
     {
         if (!(state->block_pdata & (1 << 4)))
             light_top = 0;

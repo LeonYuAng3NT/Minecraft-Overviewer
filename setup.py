@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import sys
 import traceback
@@ -175,7 +175,7 @@ for name in glob.glob("overviewer_core/src/primitives/*.c"):
     name = os.path.splitext(name)[0]
     primitives.append(name)
 
-c_overviewer_files = ['main.c', 'composite.c', 'iterate.c', 'endian.c', 'rendermodes.c']
+c_overviewer_files = ['main.c', 'composite.c', 'iterate.c', 'endian.c', 'rendermodes.c', 'block_class.c']
 c_overviewer_files += map(lambda mode: 'primitives/%s.c' % (mode,), primitives)
 c_overviewer_files += ['Draw.c']
 c_overviewer_includes = ['overviewer.h', 'rendermodes.h']
@@ -279,6 +279,7 @@ class CustomBuild(build):
             print("at <http://docs.overviewer.org/en/latest/building/>.  If you are")
             print("still having build problems, file an incident on the github tracker")
             print("or find us in IRC.")
+            sys.exit(1)
 
 class CustomBuildExt(build_ext):
     def build_extensions(self):
@@ -287,15 +288,15 @@ class CustomBuildExt(build_ext):
             # customize the build options for this compilier
             for e in self.extensions:
                 e.extra_link_args.append("/MANIFEST")
+                e.extra_link_args.append("/DWINVER=0x060")
+                e.extra_link_args.append("/D_WIN32_WINNT=0x060")
         if c == "unix":
             # customize the build options for this compilier
             for e in self.extensions:
                 e.extra_compile_args.append("-Wno-unused-variable") # quell some annoying warnings
                 e.extra_compile_args.append("-Wno-unused-function") # quell some annoying warnings
                 e.extra_compile_args.append("-Wdeclaration-after-statement")
-                p = platform.linux_distribution()
-                if not (p[0] == 'CentOS' and p[1][0] == '5'):
-                    e.extra_compile_args.append("-Werror=declaration-after-statement")
+                e.extra_compile_args.append("-Werror=declaration-after-statement")
 
 
         # build in place, and in the build/ tree

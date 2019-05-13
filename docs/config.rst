@@ -694,15 +694,28 @@ Image options
 
 ``imgformat``
     This is which image format to render the tiles into. Its value should be a
-    string containing "png", "jpg", or "jpeg".
+    string containing "png", "jpg", "jpeg" or "webp".
+
+    .. note::
+        For WebP, your PIL/Pillow needs to be built with WebP support. Do
+        keep in mind that not all browsers support WebP images.
 
     **Default:** ``"png"``
 
 ``imgquality``
-    This is the image quality used when saving the tiles into the JPEG image
-    format. Its value should be an integer between 0 and 100.
+    This is the image quality used when saving the tiles into the JPEG or WebP
+    image format. Its value should be an integer between 0 and 100.
+
+    For WebP images in lossless mode, it determines how much effort is spent
+    on compressing the image.
 
     **Default:** ``95``
+
+``imglossless``
+    Determines whether a WebP image is saved in lossless or lossy mode. Has
+    no effect on other image formats.
+
+    **Default:** ``True``
 
 ``optimizeimg``
 
@@ -776,6 +789,25 @@ Image options
             see almost no benefit.
 
             **Default:** ``2``
+
+    ``oxipng``
+        An optipng replacement written in Rust. Works much like optipng.
+
+        ``olevel``
+            An integer between ``0`` (few optimizations) and ``6`` (many
+            optimizations). The default should be satisfactory for everyone,
+            higher levels than the default see almost no benefit.
+
+            **Default:** ``2``
+
+        ``threads``
+            An integer specifying how many threads per process to use. Note that
+            Overviewer spawns one oxipng process per Overviewer worker process,
+            so increasing this value if you already have one Overviewer process
+            per CPU thread makes little sense, and can actually slow down the
+            rendering.
+
+            **Default:** ``1``
 
     ``pngcrush``
         pngcrush, like optipng, is a lossless PNG recompressor. If you are able to do so, it
