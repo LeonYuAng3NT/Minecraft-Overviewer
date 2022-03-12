@@ -265,19 +265,22 @@ If you want or need to provide your own textures, you have several options:
 
   You can use the following commands to download the client jar on Linux or Mac.
   Run the first line in a terminal, changing the version string to the latest as appropriate
-  (these docs may not always be updated to reflect the latest). Then paste the second line
+  (these docs may not always be updated to reflect the latest). Then paste the second line into
+  your terminal to create directories if necessary. Then paste the third line
   into your terminal to download the latest version. ``${VERSION}`` will be replaced
-  by the actual version string from the first line.
+  by the actual version string from the first line. These 3 lines can be included in a shell
+  script prior to map generation to ensure the proper textures are always downloaded.
 
   ::
 
-    VERSION=1.14
+    VERSION=1.17
+    mkdir -p ~/.minecraft/versions/${VERSION}/
     wget https://overviewer.org/textures/${VERSION} -O ~/.minecraft/versions/${VERSION}/${VERSION}.jar
 
   If that's too confusing for you, then just take this single line and paste it into
-  a terminal to get 1.14 textures::
+  a terminal to get 1.17 textures::
 
-    wget https://overviewer.org/textures/1.14 -O ~/.minecraft/versions/1.14/1.14.jar
+    mkdir -p ~/.minecraft/versions/1.17/ && wget https://overviewer.org/textures/1.17 -O ~/.minecraft/versions/1.17/1.17.jar
 
 * You can also just run the launcher to install the client.
 
@@ -306,15 +309,3 @@ modification times intact, use ``cp -p``. For people who render from backups,
 GNU ``tar`` automatically handles modification times correctly. ``rsync -a
 --delete`` will handle this correctly as well. If you use some other tool,
 you'll have to figure out how to do this yourself.
-
-HTTPS support
--------------
-
-In order to support displaying maps over HTTPS, Overviewer loads the Google
-maps API and JQuery over HTTPS. This avoids security warnings for HTTPS
-sites, and is not expected to cause problems for users.
-
-If this change causes problems, take a look at the
-:ref:`custom web assets<customwebassets>` option. This allows you to
-provide a custom index.html which loads the required Javascript libraries
-over HTTP.

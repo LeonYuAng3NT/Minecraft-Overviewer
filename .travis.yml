@@ -1,10 +1,13 @@
 language: python
+dist: xenial
 python:
-  # - "2.6"
-  - "2.7"
-  # - "3.2"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "3.9"
 env:
-  - MC_VERSION=1.14
+  - MC_VERSION=1.17
 before_install:
   - wget https://raw.githubusercontent.com/python-pillow/Pillow/master/src/libImaging/Imaging.h
   - wget https://raw.githubusercontent.com/python-pillow/Pillow/master/src/libImaging/ImagingUtils.h
@@ -12,16 +15,15 @@ before_install:
 install:
   - pip install -q pillow
   - pip install -q numpy
-  - python setup.py build
+  - pip install -q networkx
+  - pip install -q pytest
+  - python3 setup.py build
 before_script:
   - git clone git://github.com/overviewer/Minecraft-Overviewer-Addons.git ~/mcoa/
   - mkdir -p ~/.minecraft/versions/${MC_VERSION}/
   - wget -N https://overviewer.org/textures/${MC_VERSION} -O ~/.minecraft/versions/${MC_VERSION}/${MC_VERSION}.jar
 script:
-  - PYTHONPATH=. python test/test_all.py
-  - python overviewer.py ~/mcoa/exmaple ~/test-output --rendermodes=smooth-lighting -p1
+  - pytest
+  - python3 overviewer.py ~/mcoa/exmaple ~/test-output --rendermodes=smooth-lighting -p1
 notifications:
   email: false
-# matrix:
-  # allow_failures:
-    # - python: "3.2"

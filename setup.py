@@ -1,14 +1,14 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import sys
 import traceback
 
+
 # quick version check
-if not (sys.version_info[0] == 2 and sys.version_info[1] >= 6):
-    print("Sorry, the Overviewer requires at least Python 2.6 to run")
-    if sys.version_info[0] >= 3:
-        print("and will not run on Python 3.0 or later")
+if sys.version_info[0] == 2 or (sys.version_info[0] == 3 and sys.version_info[1] < 4):
+    print("Sorry, the Overviewer requires at least Python 3.4 to run.")
     sys.exit(1)
+
 
 from distutils.core import setup
 from distutils.extension import Extension
@@ -176,12 +176,12 @@ for name in glob.glob("overviewer_core/src/primitives/*.c"):
     primitives.append(name)
 
 c_overviewer_files = ['main.c', 'composite.c', 'iterate.c', 'endian.c', 'rendermodes.c', 'block_class.c']
-c_overviewer_files += map(lambda mode: 'primitives/%s.c' % (mode,), primitives)
+c_overviewer_files += ['primitives/%s.c' % (mode) for mode in primitives]
 c_overviewer_files += ['Draw.c']
 c_overviewer_includes = ['overviewer.h', 'rendermodes.h']
 
-c_overviewer_files = map(lambda s: 'overviewer_core/src/'+s, c_overviewer_files)
-c_overviewer_includes = map(lambda s: 'overviewer_core/src/'+s, c_overviewer_includes)
+c_overviewer_files = ['overviewer_core/src/' + s for s in c_overviewer_files]
+c_overviewer_includes = ['overviewer_core/src/' + s for s in c_overviewer_includes]
 
 setup_kwargs['ext_modules'].append(Extension('overviewer_core.c_overviewer', c_overviewer_files, include_dirs=['.', numpy_include] + pil_include, depends=c_overviewer_includes, extra_link_args=[]))
 
@@ -212,8 +212,8 @@ class CustomClean(clean):
                         os.remove(fname)
 
                 except OSError:
-                    log.warn("'%s' could not be cleaned -- permission denied",
-                             fname)
+                    log.warning("'%s' could not be cleaned -- permission denied",
+                                fname)
             else:
                 log.debug("'%s' does not exist -- can't clean it",
                           fname)
@@ -223,7 +223,7 @@ class CustomClean(clean):
             for f in files:
                 if f.endswith(".pyc"):
                     if self.dry_run:
-                        log.warn("Would remove %s", os.path.join(root,f))
+                        log.warning("Would remove %s", os.path.join(root,f))
                     else:
                         os.remove(os.path.join(root, f))
 
@@ -297,6 +297,8 @@ class CustomBuildExt(build_ext):
                 e.extra_compile_args.append("-Wno-unused-function") # quell some annoying warnings
                 e.extra_compile_args.append("-Wdeclaration-after-statement")
                 e.extra_compile_args.append("-Werror=declaration-after-statement")
+                e.extra_compile_args.append("-O3")
+                e.extra_compile_args.append("-std=gnu99")
 
 
         # build in place, and in the build/ tree

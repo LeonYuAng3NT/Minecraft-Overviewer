@@ -12,9 +12,10 @@
 #
 #    You should have received a copy of the GNU General Public License along
 #    with the Overviewer.  If not, see <http://www.gnu.org/licenses/>.
+from datetime import datetime, timedelta
 
 from PIL import Image
-import textures
+from . import textures
 
 """The contents of this file are imported into the namespace of config files.
 It also defines the render primitive objects, which are used by the C code.
@@ -31,13 +32,13 @@ class RenderPrimitive(object):
             raise RuntimeError("RenderPrimitive cannot be used directly")
         
         self.option_values = {}
-        for key, val in kwargs.iteritems():
+        for key, val in kwargs.items():
             if not key in self.options:
                 raise ValueError("primitive `{0}' has no option `{1}'".format(self.name, key))
             self.option_values[key] = val
         
         # set up defaults
-        for name, (description, default) in self.options.iteritems():
+        for name, (description, default) in self.options.items():
             if not name in self.option_values:
                 self.option_values[name] = default
 
@@ -229,6 +230,17 @@ class BiomeOverlay(Overlay):
     options = {
         'biomes' : ('a list of (biome, (r, g, b)) tuples for coloring biomes', None),
         'alpha'  : ('an integer value between 0 (transparent) and 255 (opaque)', None),
+    }
+
+class HeatmapOverlay(Overlay):
+    t_now = datetime.now()
+    name = "overlay-heatmap"
+    options = {
+        't_invisible': (
+            'the timestamp when the overlay will get invisible (e.g. 1 month go)',
+            int((t_now - timedelta(days=30)).timestamp())
+        ),
+        't_full': ('the timestamp when the overlay will be fully visible (e.g. now)', int(t_now.timestamp())),
     }
 
 class Hide(RenderPrimitive):

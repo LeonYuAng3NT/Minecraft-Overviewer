@@ -15,8 +15,8 @@ Python, don't worry, it's pretty simple. Just follow the examples.
 
 .. note::
 
-    You should *always* use forward slashes ("/"), even on
-    Windows.  This is required because the backslash ("\\") has special meaning
+    You should *always* use forward slashes (``/``), even on
+    Windows.  This is required because the backslash (``\``) has special meaning
     in Python.  
 
 Examples
@@ -287,7 +287,7 @@ Observers
     If you want to specify an observer manually, try something like:
     ::
 
-        from observer import ProgressBarObserver
+        from .observer import ProgressBarObserver
         observer = ProgressBarObserver()
 
     There are currently three observers available: ``LoggingObserver``, 
@@ -304,6 +304,9 @@ Observers
     ``JSObserver(outputdir[, minrefresh][, messages])``
         This will display render progress on the output map in the bottom right
         corner of the screen. ``JSObserver``.
+
+        .. note::
+            JSObserver does not work on locally opened maps, but requires a running HTTP server.
 
         * ``outputdir="<output directory path"``
             Path to overviewer output directory. For simplicity, specify this 
@@ -338,7 +341,7 @@ Observers
 
         ::
 
-            from observer import JSObserver
+            from .observer import JSObserver
             observer = JSObserver(outputdir, 10)
                 
 		
@@ -352,7 +355,7 @@ Observers
         
             ## An example that updates both a LoggingObserver and a JSObserver
             # Import the Observers
-            from observer import MultiplexingObserver, LoggingObserver, JSObserver
+            from .observer import MultiplexingObserver, LoggingObserver, JSObserver
             
             # Construct the LoggingObserver
             loggingObserver = LoggingObserver()
@@ -412,7 +415,7 @@ Custom web assets
 .. _customwebassets:
 
 ``customwebassets = "<path to custom web assets>"``
-    This option allows you to speciy a directory containing custom web assets
+    This option allows you to specify a directory containing custom web assets
     to be copied to the output directory. Any files in the custom web assets 
     directory overwrite the default files.
 
@@ -431,7 +434,7 @@ Custom web assets
 
 .. _renderdict:
 
-Render Dictonary Keys
+Render Dictionary Keys
 ---------------------
 
 The render dictionary is a dictionary mapping configuration key strings to
@@ -594,6 +597,12 @@ Rendering
     called "night".  You want to create a Biome Overlay to be displayed on top
     of the "day" render.  Your config file might look like this:
 
+    .. note::
+
+        When 'overlay' is used the ``imgformat`` must be set to a transparent image
+        format like ``"png"``. Otherwise the overlay is rendered without transparency
+        and the render underneath will not show.
+
     ::
 
         outputdir = "output_dir"
@@ -722,6 +731,11 @@ Image options
     .. warning::
         Using image optimizers will increase render times significantly.
 
+    .. note::
+        With the port to Python 3, the import line has changed. Prefix the
+        ``optimizeimages`` module with a period, so
+        ``from .optimizeimages import foo, bar``.
+
     This option specifies which additional tools overviewer should use to
     optimize the filesize of rendered tiles.
     The tools used must be placed somewhere where overviewer can find them, for
@@ -731,7 +745,7 @@ Image options
     the order in which they're specified::
         
         # Import the optimizers we need
-        from optimizeimages import pngnq, optipng
+        from .optimizeimages import pngnq, optipng
 
         worlds["world"] = "/path/to/world"
 
@@ -945,6 +959,16 @@ Other HTML/JS output options
     the format of (r,b,g,a). The alpha entry should be set to 0.
 
     **Default:** ``#1a1a1a``
+
+``center``
+    This is allows you to specify a list or a tuple of Minecraft world coordinates
+    that should be used as the map's default center, e.g. ``[800, 64, -334]``.
+
+    You may also specify only two coordinates, in case they will be interpreted as
+    X and Z coordinates, and Y is assumed to be ``64`` (sea level).
+
+    **Default:** The coordinates of your spawn, or ``[0, 64, 0]`` if the regionset
+    has no spawn.
 
 Map update behavior
 ~~~~~~~~~~~~~~~~~~~
@@ -1226,6 +1250,29 @@ BiomeOverlay
         Example::
 
             BiomeOverlay(biomes=[("Forest", (0, 255, 0)), ("Desert", (255, 0, 0))])
+
+HeatmapOverlay
+    Color the map according to when a chunk was last visited. The color for Timestamps 
+    between t_invisible and t_full will be interpolated between 0 and 255.
+    This RenderPrimitive might require use of the forcerender option. 
+    Otherwise the Overlay might not get updated for not visited chunks (resulting in them
+    always being the brightest color, as if recently visited).
+
+    **Options**
+    
+    t_invisible
+        The timestamp when the overlay will get invisible. The default is 30 days ago.
+    
+    t_now
+        The timestamp when the overlay will be fully visible. The default is today.
+    
+    Example::
+
+        HeatmapOverlay(
+            t_invisible=int((t_now - timedelta(days=2)).timestamp()),
+            t_full=int(t_now.timestamp()),
+        )
+
 
 Defining Custom Rendermodes
 ---------------------------
